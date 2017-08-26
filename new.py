@@ -28,10 +28,15 @@ def main(stdscr):
             stdscr.addstr(0, position, text[position], curses.A_STANDOUT)
             stdscr.addstr(0, position+1, text[position+1:])
 
-        c = stdscr.getkey()
-
-        so_far += c
-        so_far_word += c
+        c = stdscr.getch()
+        if c == 127:
+            if len(so_far_word) > 0:
+                so_far = so_far[:-1]
+                so_far_word = so_far_word[:-1]
+                stdscr.clear()
+        elif len(chr(c)) == 1:
+            so_far += chr(c)
+            so_far_word += chr(c)
         position = len(so_far)
         stdscr.addstr(1, 0, so_far_word, curses.color_pair(1))
 
