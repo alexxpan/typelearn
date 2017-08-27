@@ -8,4 +8,6 @@ It generates text to type using the praw Reddit API (https://praw.readthedocs.io
   
 WPM is calculated by using the typical formula of assuming an average word length of 5. It takes the number of characters typed per second, divides it by 5, and multiplies it by 60.
 
+To play, download the typelearn.py file. Navigate to the file in your terminal, and start the script by running 'python typelearn.py'. That's it!
+
 *Note: Optimized for mac usage.
