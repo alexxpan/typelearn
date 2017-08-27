@@ -1,6 +1,6 @@
 # typelearn
 
-Typelearn is a terminal-based, productivity game. It is designed to improve typing speed while staying up-tp-date with current events and learning new information.
+Typelearn is a terminal-based productivity game. It is designed to improve typing speed while staying up-tp-date with current events and learning new information.
 
 It generates text to type using the praw Reddit API (https://praw.readthedocs.io/en/latest/index.html). Submission titles and urls are pulled from the 'hot' section of the following subreddits:
   - r/news
