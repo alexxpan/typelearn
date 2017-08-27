@@ -1,10 +1,28 @@
 import curses 
 from curses import wrapper
 import time
+import praw
+import random
 
-# return a random text string for the user to type
-def getText():
-    return "hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi"
+# initiate a Reddit instance, return a list of (title, url) tuples to choose text from
+def generateRedditText():
+    reddit = praw.Reddit(client_id='ShnOH4X_5CuPmA',
+                         client_secret='2Pi7dfAvjf58uZ7Vt0-eZ4sZ4WA',
+                         user_agent='mac:typelearn:v1 (by /u/BigYamini)')
+    subreddit_list = [reddit.subreddit('news'),
+                      reddit.subreddit('worldnews'),
+                      reddit.subreddit('futurology'),
+                      reddit.subreddit('politics')]
+    tuple_list = []
+    for subreddit in subreddit_list:
+        for submission in subreddit.hot(limit=15):
+            tuple_list.append((submission.title, submission.url))
+    return tuple_list
+            
+
+# returns a random text string and its source for the user to type, from the input list
+def getText(tuple_list):
+    return random.choice(tuple_list)
 
 # split a text string into a word list for tracking
 def splitText(text):
@@ -45,8 +63,11 @@ def main(stdscr):
     curses.init_pair(1, curses.COLOR_GREEN, -1)
     curses.init_pair(2, curses.COLOR_RED, -1)
     curses.init_pair(3, curses.COLOR_MAGENTA, -1)
+    curses.init_pair(4, curses.COLOR_BLUE, -1)
 
-    text = getText()
+    # generate text for the user to type
+    tuple_list = generateRedditText()
+    text, source = getText(tuple_list)
     word_list = splitText(text)
         
     # initialize variables
@@ -60,9 +81,6 @@ def main(stdscr):
 
     while True:
         displayText(stdscr, text, position, y, x)
-        stdscr.addstr(15,0,str(x))
-        stdscr.addstr(16,0,str(y))
-        stdscr.addstr(17,0,str(len(text) // x))
        
         # handle screen resizes
         if curses.is_term_resized(y, x):
@@ -120,11 +138,13 @@ def main(stdscr):
         # detect when the text is finished being typed        
         if so_far == text:
             end_time = time.time()
-            # calculate and display wpm
+            # calculate and display wpm and source
             wpm = calculateWPM(text, start_time, end_time)
             stdscr.addstr((len(text) // x) + 2, 2, "WPM: ", curses.A_BOLD)
             stdscr.addstr((len(text) // x) + 2, 7, str(wpm), curses.color_pair(3))
             stdscr.addstr((len(text) // x) + 4, 0, "Press Enter to continue playing or 'r' to redo. Hit ESC to quit.", curses.A_BOLD)
+            stdscr.addstr((len(text) // x) + 6, 0, "Source: ", curses.A_BOLD)
+            stdscr.addstr((len(text) // x) + 6, 8, source, curses.color_pair(4))
             # reset the game
             valid_option = False
             while True:
