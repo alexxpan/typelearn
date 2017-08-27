@@ -16,8 +16,7 @@ def splitText(text):
     return word_list
 
 # display text on screen, with the user's current position highlighted
-def displayText(stdscr, text, position):
-    y, x = stdscr.getmaxyx()
+def displayText(stdscr, text, position, y, x):
 
     # highlight first character if at the start
     if position == 0:
@@ -57,16 +56,26 @@ def main(stdscr):
     word_index = 0
     start_time = None
     quit = False
+    y, x = stdscr.getmaxyx()
 
     while True:
-        displayText(stdscr, text, position)
-
+        displayText(stdscr, text, position, y, x)
+        stdscr.addstr(15,0,str(x))
+        stdscr.addstr(16,0,str(y))
+        stdscr.addstr(17,0,str(len(text) // x))
+       
+        # handle screen resizes
+        if curses.is_term_resized(y, x):
+            stdscr.clear()
+            y, x = stdscr.getmaxyx()
+            displayText(stdscr, text, position, y, x)
+       
         if quit:
             break
 
-        stdscr.addstr(2, 0, "> ")
+        stdscr.addstr((len(text) // x) + 2, 0, "> ")
         if start_time is None:
-            stdscr.addstr(4, 0, "Start typing to begin. Hit ESC to quit.", curses.A_BOLD)
+            stdscr.addstr((len(text) // x) + 4, 0, "Start typing to begin. Hit ESC to quit.", curses.A_BOLD)
 
         c = stdscr.getch()
 
@@ -75,7 +84,7 @@ def main(stdscr):
             break
 
         # start a timer after the first key is pressed
-        if c is not None and start_time is None:
+        if c < 256 and start_time is None:
             stdscr.clear() 
             start_time = time.time()
 
@@ -97,10 +106,10 @@ def main(stdscr):
         current_word = word_list[word_index]
         # display red if typo
         if so_far_word != current_word[:len(so_far_word)]:
-            stdscr.addstr(2, 2, so_far_word, curses.color_pair(2))
+            stdscr.addstr((len(text) // x) + 2, 2, so_far_word, curses.color_pair(2))
         # otherwise, green
         else:
-            stdscr.addstr(2, 2, so_far_word, curses.color_pair(1))
+            stdscr.addstr((len(text) // x) + 2, 2, so_far_word, curses.color_pair(1))
 
         # clear the input section when words are typed correctly
         if so_far_word == current_word and word_index < len(word_list) - 1:
@@ -113,9 +122,9 @@ def main(stdscr):
             end_time = time.time()
             # calculate and display wpm
             wpm = calculateWPM(text, start_time, end_time)
-            stdscr.addstr(2, 2, "WPM: ", curses.A_BOLD)
-            stdscr.addstr(2, 7, str(wpm), curses.color_pair(3))
-            stdscr.addstr(4, 0, "Press Enter to continue playing or 'r' to redo. Hit ESC to quit.", curses.A_BOLD)
+            stdscr.addstr((len(text) // x) + 2, 2, "WPM: ", curses.A_BOLD)
+            stdscr.addstr((len(text) // x) + 2, 7, str(wpm), curses.color_pair(3))
+            stdscr.addstr((len(text) // x) + 4, 0, "Press Enter to continue playing or 'r' to redo. Hit ESC to quit.", curses.A_BOLD)
             # reset the game
             valid_option = False
             while True:
@@ -137,6 +146,5 @@ def main(stdscr):
                     start_time = None
                     done = False
                     quit = False
-                    break
 
 wrapper(main)
