@@ -4,7 +4,7 @@ import time
 
 # return a random text string for the user to type
 def getText():
-    return "This is a test sentence."
+    return "hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi"
 
 # split a text string into a word list for tracking
 def splitText(text):
@@ -17,19 +17,21 @@ def splitText(text):
 
 # display text on screen, with the user's current position highlighted
 def displayText(stdscr, text, position):
+    y, x = stdscr.getmaxyx()
+
     # highlight first character if at the start
     if position == 0:
-        stdscr.addstr(0, position, text[0], curses.A_STANDOUT)
+        stdscr.addstr(0, 0, text[0], curses.A_STANDOUT)
         stdscr.addstr(0, position+1, text[position+1:])
     # highlight last character if past the end
     elif position >= len(text):
         stdscr.addstr(0, 0, text[:len(text)-1])
-        stdscr.addstr(0, len(text)-1, text[len(text)-1], curses.A_STANDOUT)
+        stdscr.addstr(position // x, (len(text)-1) % x, text[len(text)-1], curses.A_STANDOUT)
     # highlight the next character to type
     else: 
         stdscr.addstr(0, 0, text[:position])
-        stdscr.addstr(0, position, text[position], curses.A_STANDOUT)
-        stdscr.addstr(0, position+1, text[position+1:])
+        stdscr.addstr(position // x, position % x, text[position], curses.A_STANDOUT)
+        stdscr.addstr((position+1) // x, (position+1) % x, text[position+1:])
 
 def calculateWPM(text, start, end):
     time_elapsed = end - start
@@ -113,17 +115,17 @@ def main(stdscr):
             wpm = calculateWPM(text, start_time, end_time)
             stdscr.addstr(2, 2, "WPM: ", curses.A_BOLD)
             stdscr.addstr(2, 7, str(wpm), curses.color_pair(3))
-            stdscr.addstr(4, 0, "Press enter to continue playing or 'r' to redo. Hit ESC to quit.", curses.A_BOLD)
+            stdscr.addstr(4, 0, "Press Enter to continue playing or 'r' to redo. Hit ESC to quit.", curses.A_BOLD)
             # reset the game
             valid_option = False
-            while not valid_option:
+            while True:
                 d = stdscr.getch()
                 # ESC (27) pressed
                 if d == 27:
                     quit = True
                     break
-                # enter key (13) or 'r' key (114) pressed
-                elif d == 13 or d == 114:
+                # enter key (10) or 'r' key (114) pressed
+                elif d == 10 or d == 114:
                     if d == 114:
                         text = getText()
                     # re-initialize variables and clear screen
@@ -136,10 +138,5 @@ def main(stdscr):
                     done = False
                     quit = False
                     break
-
-                        
-            
-
-
 
 wrapper(main)
