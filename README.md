@@ -12,4 +12,6 @@ WPM is calculated by using the typical formula of assuming an average word lengt
 
 To play, download the typelearn.py file. Navigate to the file in your terminal, and start the script by running 'python typelearn.py'. That's it!
 
+*Note: Requires external dependencies. Run 'pip install praw' in terminal to download the required libraries
+
 *Note: Optimized for mac usage.
