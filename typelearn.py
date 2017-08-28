@@ -16,7 +16,11 @@ def generateRedditText():
     tuple_list = []
     for subreddit in subreddit_list:
         for submission in subreddit.hot(limit=15):
-            tuple_list.append((submission.title, submission.url))
+            submission_title, submission_url = submission.title, submission.url
+            # change curly quotes to straight quotes
+            submission_title = submission_title.replace("’","'").replace("‘","'").replace('“','"').replace('”','"')
+            submission_url = submission_url.replace("’","'").replace("‘","'").replace('“','"').replace('”','"')
+            tuple_list.append((submission_title, submission_url))
     return tuple_list
             
 
@@ -114,7 +118,7 @@ def main(stdscr):
                 stdscr.clear()
 
         # handle user character input
-        elif c < 256:
+        elif c < 256 and c != 10:
             so_far += chr(c)
             so_far_word += chr(c)
 
@@ -155,8 +159,9 @@ def main(stdscr):
                     break
                 # enter key (10) or 'r' key (114) pressed
                 elif d == 10 or d == 114:
-                    if d == 114:
-                        text = getText()
+                    if d == 10:
+                        text, source = getText(tuple_list)
+                        word_list = splitText(text)
                     # re-initialize variables and clear screen
                     stdscr.clear()
                     so_far = ""
@@ -166,5 +171,7 @@ def main(stdscr):
                     start_time = None
                     done = False
                     quit = False
+                    y, x = stdscr.getmaxyx()
+                    break
 
 wrapper(main)
